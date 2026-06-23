@@ -1,0 +1,5 @@
+/vendor/
+/dist/
+/*.zip
+.idea/
+.DS_Store

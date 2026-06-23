@@ -1,0 +1,13 @@
+image: composer:2
+
+pipelines:
+  default:
+    - step:
+        name: Plugin standards and package checks
+        caches:
+          - composer
+        script:
+          - apk add --no-cache zip
+          - composer validate --strict
+          - composer install --no-interaction --prefer-dist --no-progress
+          - composer check

@@ -1,0 +1,29 @@
+{
+    "name": "shanemuir/json-sync-guard-for-acf",
+    "description": "Development tooling for JSON Sync Guard for ACF.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "wp-coding-standards/wpcs": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+        "phpcs": "phpcs --standard=phpcs.xml.dist",
+        "package": "sh scripts/check-package.sh",
+        "check": [
+            "@lint",
+            "@phpcs",
+            "@package"
+        ],
+        "build": "sh scripts/build-zip.sh",
+        "hooks": "sh scripts/install-hooks.sh"
+    }
+}

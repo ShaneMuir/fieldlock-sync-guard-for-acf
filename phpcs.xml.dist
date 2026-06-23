@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="JSON Sync Guard for ACF">
+	<description>WordPress and PHP compatibility checks for the plugin.</description>
+
+	<arg name="basepath" value="." />
+	<arg name="colors" />
+	<arg name="extensions" value="php" />
+	<arg value="ps" />
+
+	<config name="testVersion" value="8.2-" />
+
+	<file>json-sync-guard-for-acf.php</file>
+	<file>includes</file>
+	<file>uninstall.php</file>
+
+	<rule ref="WordPress" />
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="json-sync-guard-for-acf" />
+			</property>
+		</properties>
+	</rule>
+	<rule ref="PHPCompatibilityWP" />
+</ruleset>
