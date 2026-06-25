@@ -11,7 +11,7 @@
 		buttons.forEach( function ( button ) {
 			button.disabled = true;
 			button.setAttribute( 'aria-disabled', 'true' );
-			button.setAttribute( 'title', jsonSyncGuardForAcf.message );
+			button.setAttribute( 'title', fieldLockSyncGuardForAcf.message );
 			button.classList.add( 'disabled' );
 		} );
 	}

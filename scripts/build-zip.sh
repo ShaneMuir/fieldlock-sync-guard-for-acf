@@ -2,7 +2,7 @@
 
 set -eu
 
-plugin_slug="json-sync-guard-for-acf"
+plugin_slug="fieldlock-sync-guard-for-acf"
 output="${1:-dist/${plugin_slug}.zip}"
 staging="$(mktemp -d)"
 
@@ -20,8 +20,8 @@ mkdir -p "$staging/$plugin_slug/includes"
 mkdir -p "$staging/$plugin_slug/assets/js"
 mkdir -p "$(dirname "$output")"
 
-cp json-sync-guard-for-acf.php readme.txt uninstall.php "$staging/$plugin_slug/"
-cp includes/class-json-sync-guard-for-acf.php "$staging/$plugin_slug/includes/"
+cp fieldlock-sync-guard-for-acf.php readme.txt uninstall.php "$staging/$plugin_slug/"
+cp includes/class-fieldlock-sync-guard-for-acf.php "$staging/$plugin_slug/includes/"
 cp assets/js/admin-field-group-lock.js "$staging/$plugin_slug/assets/js/"
 
 (

@@ -1,4 +1,4 @@
-=== JSON Sync Guard for ACF ===
+=== FieldLock Sync Guard for ACF ===
 Contributors: shanemuir
 Tags: acf, advanced custom fields, local json, sync, field groups
 Requires at least: 7.0
@@ -12,7 +12,7 @@ Prevents ACF field groups from being edited while Local JSON changes are waiting
 
 == Description ==
 
-JSON Sync Guard for ACF detects ACF field-group JSON files that do not yet exist in the WordPress database or have a newer modified timestamp. While a sync is pending, it:
+FieldLock Sync Guard for ACF detects ACF field-group JSON files that do not yet exist in the WordPress database or have a newer modified timestamp. While a sync is pending, it:
 
 * Shows an administrator notice with a link to ACF's sync screen.
 * Disables the Update button on ACF field-group edit screens.
@@ -20,13 +20,15 @@ JSON Sync Guard for ACF detects ACF field-group JSON files that do not yet exist
 
 Private Local JSON files are ignored. Detection is cached briefly and runs only in the WordPress administrator. The plugin works with ACF and ACF PRO, and does not include ACF.
 
+FieldLock Sync Guard for ACF is an independent compatibility plugin and is not affiliated with, endorsed by, or sponsored by the owners of ACF or ACF PRO.
+
 The plugin makes no remote requests, collects no telemetry, and contains no upsells.
 
 == Installation ==
 
 1. Upload the plugin directory to `/wp-content/plugins/`, or install the plugin ZIP through Plugins > Add New.
 2. Activate ACF or ACF PRO.
-3. Activate JSON Sync Guard for ACF.
+3. Activate FieldLock Sync Guard for ACF.
 4. When a warning appears, follow its link and sync the pending field groups in ACF.
 
 == Frequently Asked Questions ==
@@ -39,14 +41,14 @@ A non-private `group_` Local JSON item is pending when its key does not exist as
 
 Yes. Developers can use these filters:
 
-* `json_sync_guard_for_acf_should_lock` changes the final lock decision.
-* `json_sync_guard_for_acf_sync_url` changes the notice link.
-* `json_sync_guard_for_acf_cache_lifetime` changes the transient lifetime in seconds.
-* `json_sync_guard_for_acf_capability` changes the capability used for notices and locks.
+* `fieldlock_sync_guard_for_acf_should_lock` changes the final lock decision.
+* `fieldlock_sync_guard_for_acf_sync_url` changes the notice link.
+* `fieldlock_sync_guard_for_acf_cache_lifetime` changes the transient lifetime in seconds.
+* `fieldlock_sync_guard_for_acf_capability` changes the capability used for notices and locks.
 
 Example:
 
-`add_filter( 'json_sync_guard_for_acf_cache_lifetime', function () { return 30; } );`
+`add_filter( 'fieldlock_sync_guard_for_acf_cache_lifetime', function () { return 30; } );`
 
 == Changelog ==
 
