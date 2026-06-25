@@ -13,7 +13,7 @@ Build the WordPress.org submission archive with:
 composer build
 ```
 
-The archive is written to `dist/json-sync-guard-for-acf.zip`.
+The archive is written to `dist/fieldlock-sync-guard-for-acf.zip`.
 
 To enable the tracked pre-commit hook in this clone, run once:
 

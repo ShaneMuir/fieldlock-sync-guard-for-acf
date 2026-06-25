@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="JSON Sync Guard for ACF">
+<ruleset name="FieldLock Sync Guard for ACF">
 	<description>WordPress and PHP compatibility checks for the plugin.</description>
 
 	<arg name="basepath" value="." />
@@ -9,7 +9,7 @@
 
 	<config name="testVersion" value="8.2-" />
 
-	<file>json-sync-guard-for-acf.php</file>
+	<file>fieldlock-sync-guard-for-acf.php</file>
 	<file>includes</file>
 	<file>uninstall.php</file>
 
@@ -17,7 +17,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="json-sync-guard-for-acf" />
+				<element value="fieldlock-sync-guard-for-acf" />
 			</property>
 		</properties>
 	</rule>

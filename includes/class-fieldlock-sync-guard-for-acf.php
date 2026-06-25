@@ -2,7 +2,7 @@
 /**
  * Main plugin class.
  *
- * @package JSON_Sync_Guard_For_ACF
+ * @package FieldLock_Sync_Guard_For_ACF
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,10 +10,10 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Detects pending ACF Local JSON changes and locks field-group editing.
  */
-final class JSON_Sync_Guard_For_ACF {
+final class FieldLock_Sync_Guard_For_ACF {
 
 	/** Transient key. */
-	private const TRANSIENT_KEY = 'json_sync_guard_for_acf_pending';
+	private const TRANSIENT_KEY = 'fieldlock_sync_guard_for_acf_pending';
 
 	/**
 	 * Singleton instance.
@@ -82,9 +82,9 @@ final class JSON_Sync_Guard_For_ACF {
 		?>
 		<div class="notice notice-warning">
 			<p>
-				<strong><?php esc_html_e( 'ACF Local JSON sync is pending.', 'json-sync-guard-for-acf' ); ?></strong>
-				<?php esc_html_e( 'Field-group editing is locked until the pending JSON changes are synced.', 'json-sync-guard-for-acf' ); ?>
-				<a href="<?php echo esc_url( $url ); ?>"><?php esc_html_e( 'Review field group sync', 'json-sync-guard-for-acf' ); ?></a>
+				<strong><?php esc_html_e( 'ACF Local JSON sync is pending.', 'fieldlock-sync-guard-for-acf' ); ?></strong>
+				<?php esc_html_e( 'Field-group editing is locked until the pending JSON changes are synced.', 'fieldlock-sync-guard-for-acf' ); ?>
+				<a href="<?php echo esc_url( $url ); ?>"><?php esc_html_e( 'Review field group sync', 'fieldlock-sync-guard-for-acf' ); ?></a>
 			</p>
 		</div>
 		<?php
@@ -105,18 +105,18 @@ final class JSON_Sync_Guard_For_ACF {
 		}
 
 		wp_enqueue_script(
-			'json-sync-guard-for-acf',
-			JSON_SYNC_GUARD_FOR_ACF_URL . 'assets/js/admin-field-group-lock.js',
+			'fieldlock-sync-guard-for-acf',
+			FIELDLOCK_SYNC_GUARD_FOR_ACF_URL . 'assets/js/admin-field-group-lock.js',
 			array(),
-			JSON_SYNC_GUARD_FOR_ACF_VERSION,
+			FIELDLOCK_SYNC_GUARD_FOR_ACF_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'json-sync-guard-for-acf',
-			'jsonSyncGuardForAcf',
+			'fieldlock-sync-guard-for-acf',
+			'fieldLockSyncGuardForAcf',
 			array(
-				'message' => __( 'Sync the pending ACF Local JSON changes before editing field groups.', 'json-sync-guard-for-acf' ),
+				'message' => __( 'Sync the pending ACF Local JSON changes before editing field groups.', 'fieldlock-sync-guard-for-acf' ),
 			)
 		);
 	}
@@ -147,8 +147,8 @@ final class JSON_Sync_Guard_For_ACF {
 		}
 
 		wp_die(
-			esc_html__( 'This field group was not saved because ACF Local JSON changes are waiting to be synced.', 'json-sync-guard-for-acf' ),
-			esc_html__( 'ACF field-group editing locked', 'json-sync-guard-for-acf' ),
+			esc_html__( 'This field group was not saved because ACF Local JSON changes are waiting to be synced.', 'fieldlock-sync-guard-for-acf' ),
+			esc_html__( 'ACF field-group editing locked', 'fieldlock-sync-guard-for-acf' ),
 			array(
 				'back_link' => true,
 				'response'  => 409,
@@ -172,7 +172,7 @@ final class JSON_Sync_Guard_For_ACF {
 		 * @param bool $lock    Whether editing should be locked.
 		 * @param bool $pending Whether a pending Local JSON sync was detected.
 		 */
-		return (bool) apply_filters( 'json_sync_guard_for_acf_should_lock', $pending, $pending );
+		return (bool) apply_filters( 'fieldlock_sync_guard_for_acf_should_lock', $pending, $pending );
 	}
 
 	/**
@@ -188,7 +188,7 @@ final class JSON_Sync_Guard_For_ACF {
 		}
 
 		$pending  = $this->scan_for_pending_sync();
-		$lifetime = (int) apply_filters( 'json_sync_guard_for_acf_cache_lifetime', MINUTE_IN_SECONDS );
+		$lifetime = (int) apply_filters( 'fieldlock_sync_guard_for_acf_cache_lifetime', MINUTE_IN_SECONDS );
 
 		set_transient( self::TRANSIENT_KEY, $pending ? '1' : '0', max( 1, $lifetime ) );
 
@@ -354,7 +354,7 @@ final class JSON_Sync_Guard_For_ACF {
 			$capability = 'manage_options';
 		}
 
-		$capability = apply_filters( 'json_sync_guard_for_acf_capability', $capability );
+		$capability = apply_filters( 'fieldlock_sync_guard_for_acf_capability', $capability );
 
 		return is_string( $capability ) && current_user_can( $capability );
 	}
@@ -367,7 +367,7 @@ final class JSON_Sync_Guard_For_ACF {
 	private function get_sync_url() {
 		$url = admin_url( 'edit.php?post_type=acf-field-group&post_status=sync' );
 
-		return (string) apply_filters( 'json_sync_guard_for_acf_sync_url', $url );
+		return (string) apply_filters( 'fieldlock_sync_guard_for_acf_sync_url', $url );
 	}
 
 	/**

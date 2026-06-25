@@ -2,7 +2,7 @@
 
 set -eu
 
-plugin_slug="json-sync-guard-for-acf"
+plugin_slug="fieldlock-sync-guard-for-acf"
 workdir="$(mktemp -d)"
 archive="$workdir/$plugin_slug.zip"
 extracted="$workdir/extracted"
@@ -19,8 +19,8 @@ unzip -q "$archive" -d "$extracted"
 
 expected_files="
 $plugin_slug/assets/js/admin-field-group-lock.js
-$plugin_slug/includes/class-json-sync-guard-for-acf.php
-$plugin_slug/json-sync-guard-for-acf.php
+$plugin_slug/includes/class-fieldlock-sync-guard-for-acf.php
+$plugin_slug/fieldlock-sync-guard-for-acf.php
 $plugin_slug/readme.txt
 $plugin_slug/uninstall.php
 "
@@ -35,8 +35,8 @@ fi
 
 for file in \
 	assets/js/admin-field-group-lock.js \
-	includes/class-json-sync-guard-for-acf.php \
-	json-sync-guard-for-acf.php \
+	includes/class-fieldlock-sync-guard-for-acf.php \
+	fieldlock-sync-guard-for-acf.php \
 	readme.txt \
 	uninstall.php
 do

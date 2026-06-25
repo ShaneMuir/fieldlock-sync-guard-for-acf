@@ -1,6 +1,6 @@
 {
-    "name": "shanemuir/json-sync-guard-for-acf",
-    "description": "Development tooling for JSON Sync Guard for ACF.",
+    "name": "shanemuir/fieldlock-sync-guard-for-acf",
+    "description": "Development tooling for FieldLock Sync Guard for ACF.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require-dev": {
