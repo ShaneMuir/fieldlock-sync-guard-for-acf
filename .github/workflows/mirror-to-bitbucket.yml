@@ -12,11 +12,6 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout full history
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Set up deploy key
         run: |
           mkdir -p ~/.ssh
@@ -24,9 +19,10 @@ jobs:
           chmod 600 ~/.ssh/bitbucket_mirror
           ssh-keyscan -t ed25519 bitbucket.org >> ~/.ssh/known_hosts
 
-      - name: Push mirror to Bitbucket
+      - name: Mirror to Bitbucket
         env:
           GIT_SSH_COMMAND: ssh -i ~/.ssh/bitbucket_mirror -o IdentitiesOnly=yes
         run: |
-          git remote add bitbucket git@bitbucket.org:tribusdigital/fieldlock-sync-guard-for-acf.git
-          git push --mirror bitbucket
+          git clone --mirror "https://github.com/${{ github.repository }}.git" repo-mirror
+          cd repo-mirror
+          git push --mirror git@bitbucket.org:tribusdigital/fieldlock-sync-guard-for-acf.git
