@@ -78,15 +78,44 @@ final class FieldLock_Sync_Guard_For_ACF {
 			return;
 		}
 
-		$url = $this->get_sync_url();
+		$url            = $this->get_sync_url();
+		$pending_groups = $this->get_pending_groups();
 		?>
 		<div class="notice notice-warning">
 			<p>
 				<strong><?php esc_html_e( 'ACF Local JSON sync is pending.', 'fieldlock-sync-guard-for-acf' ); ?></strong>
-				<?php esc_html_e( 'Field-group editing is locked until the pending JSON changes are synced.', 'fieldlock-sync-guard-for-acf' ); ?>
+				<?php
+				printf(
+					/* translators: %s: Number of pending ACF field groups. */
+					esc_html( _n( '%s field group requires syncing. Editing is locked until it is synced.', '%s field groups require syncing. Editing is locked until they are synced.', count( $pending_groups ), 'fieldlock-sync-guard-for-acf' ) ),
+					esc_html( number_format_i18n( count( $pending_groups ) ) )
+				);
+				?>
 				<a href="<?php echo esc_url( $url ); ?>"><?php esc_html_e( 'Review field group sync', 'fieldlock-sync-guard-for-acf' ); ?></a>
 			</p>
+			<?php $this->render_pending_group_list( $pending_groups ); ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the pending field-group names and reasons.
+	 *
+	 * @param array $pending_groups Pending field-group details.
+	 */
+	private function render_pending_group_list( $pending_groups ) {
+		if ( empty( $pending_groups ) ) {
+			return;
+		}
+		?>
+		<ul>
+			<?php foreach ( $pending_groups as $group ) : ?>
+				<li>
+					<strong><?php echo esc_html( $group['title'] ); ?></strong>
+					&mdash; <?php echo esc_html( $this->get_pending_reason_label( $group['reason'] ) ); ?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
 		<?php
 	}
 
@@ -116,7 +145,19 @@ final class FieldLock_Sync_Guard_For_ACF {
 			'fieldlock-sync-guard-for-acf',
 			'fieldLockSyncGuardForAcf',
 			array(
-				'message' => __( 'Sync the pending ACF Local JSON changes before editing field groups.', 'fieldlock-sync-guard-for-acf' ),
+				'title'         => __( 'Field-group editing is locked', 'fieldlock-sync-guard-for-acf' ),
+				'message'       => __( 'Sync the pending ACF Local JSON changes before editing field groups.', 'fieldlock-sync-guard-for-acf' ),
+				'actionLabel'   => __( 'Review field group sync', 'fieldlock-sync-guard-for-acf' ),
+				'syncUrl'       => $this->get_sync_url(),
+				'pendingGroups' => array_map(
+					function ( $group ) {
+						return array(
+							'title'  => $group['title'],
+							'reason' => $this->get_pending_reason_label( $group['reason'] ),
+						);
+					},
+					$this->get_pending_groups()
+				),
 			)
 		);
 	}
@@ -181,16 +222,29 @@ final class FieldLock_Sync_Guard_For_ACF {
 	 * @return bool
 	 */
 	private function has_pending_sync() {
+		return ! empty( $this->get_pending_groups() );
+	}
+
+	/**
+	 * Returns details of Local JSON field groups waiting to be synced.
+	 *
+	 * @return array<int,array{key:string,title:string,reason:string}>
+	 */
+	private function get_pending_groups() {
 		$cached = get_transient( self::TRANSIENT_KEY );
 
-		if ( false !== $cached ) {
-			return '1' === $cached;
+		if ( is_string( $cached ) ) {
+			$decoded = json_decode( $cached, true );
+
+			if ( is_array( $decoded ) ) {
+				return $decoded;
+			}
 		}
 
 		$pending  = $this->scan_for_pending_sync();
 		$lifetime = (int) apply_filters( 'fieldlock_sync_guard_for_acf_cache_lifetime', MINUTE_IN_SECONDS );
 
-		set_transient( self::TRANSIENT_KEY, $pending ? '1' : '0', max( 1, $lifetime ) );
+		set_transient( self::TRANSIENT_KEY, wp_json_encode( $pending ), max( 1, $lifetime ) );
 
 		return $pending;
 	}
@@ -198,17 +252,17 @@ final class FieldLock_Sync_Guard_For_ACF {
 	/**
 	 * Performs the uncached Local JSON scan.
 	 *
-	 * @return bool
+	 * @return array<int,array{key:string,title:string,reason:string}>
 	 */
 	private function scan_for_pending_sync() {
 		if ( ! $this->acf_ready || ! function_exists( 'acf_get_local_json_files' ) ) {
-			return false;
+			return array();
 		}
 
 		$files = acf_get_local_json_files();
 
 		if ( ! is_array( $files ) || empty( $files ) ) {
-			return false;
+			return array();
 		}
 
 		if ( function_exists( 'acf_get_internal_post_type_posts' ) ) {
@@ -216,6 +270,8 @@ final class FieldLock_Sync_Guard_For_ACF {
 		}
 
 		$database_groups = $this->get_database_field_groups();
+
+		$pending = array();
 
 		foreach ( $files as $file ) {
 			$item = $this->read_json_item( $file );
@@ -227,12 +283,14 @@ final class FieldLock_Sync_Guard_For_ACF {
 			$key      = $item['key'];
 			$modified = isset( $item['modified'] ) ? (int) $item['modified'] : 0;
 
-			if ( ! isset( $database_groups[ $key ] ) || $modified > $database_groups[ $key ] ) {
-				return true;
+			if ( ! isset( $database_groups[ $key ] ) ) {
+				$pending[] = $this->format_pending_group( $item, 'missing' );
+			} elseif ( $modified > $database_groups[ $key ] ) {
+				$pending[] = $this->format_pending_group( $item, 'newer' );
 			}
 		}
 
-		return false;
+		return $pending;
 	}
 
 	/**
@@ -240,14 +298,16 @@ final class FieldLock_Sync_Guard_For_ACF {
 	 *
 	 * This follows the same comparisons used by ACF's Sync Available screen.
 	 *
-	 * @return bool
+	 * @return array<int,array{key:string,title:string,reason:string}>
 	 */
 	private function scan_acf_field_groups() {
 		$groups = acf_get_internal_post_type_posts( 'acf-field-group' );
 
 		if ( ! is_array( $groups ) ) {
-			return false;
+			return array();
 		}
+
+		$pending = array();
 
 		foreach ( $groups as $group ) {
 			if ( ! is_array( $group ) || ! empty( $group['private'] ) || 'json' !== ( $group['local'] ?? '' ) ) {
@@ -258,17 +318,54 @@ final class FieldLock_Sync_Guard_For_ACF {
 			$modified = isset( $group['modified'] ) ? (int) $group['modified'] : 0;
 
 			if ( ! $post_id ) {
-				return true;
+				$pending[] = $this->format_pending_group( $group, 'missing' );
+				continue;
 			}
 
 			$database_modified = get_post_modified_time( 'U', true, $post_id );
 
 			if ( $modified && $modified > (int) $database_modified ) {
-				return true;
+				$pending[] = $this->format_pending_group( $group, 'newer' );
 			}
 		}
 
-		return false;
+		return $pending;
+	}
+
+	/**
+	 * Normalizes pending field-group details for caching and display.
+	 *
+	 * @param array  $group  ACF field-group data.
+	 * @param string $reason Pending reason.
+	 * @return array{key:string,title:string,reason:string}
+	 */
+	private function format_pending_group( $group, $reason ) {
+		$key   = isset( $group['key'] ) && is_string( $group['key'] ) ? $group['key'] : '';
+		$title = isset( $group['title'] ) && is_string( $group['title'] ) ? $group['title'] : '';
+
+		if ( '' === $title ) {
+			$title = $key;
+		}
+
+		return array(
+			'key'    => $key,
+			'title'  => $title,
+			'reason' => $reason,
+		);
+	}
+
+	/**
+	 * Returns a localized label for a pending reason.
+	 *
+	 * @param string $reason Pending reason.
+	 * @return string
+	 */
+	private function get_pending_reason_label( $reason ) {
+		if ( 'missing' === $reason ) {
+			return __( 'not yet imported into the database', 'fieldlock-sync-guard-for-acf' );
+		}
+
+		return __( 'Local JSON is newer than the database version', 'fieldlock-sync-guard-for-acf' );
 	}
 
 	/**

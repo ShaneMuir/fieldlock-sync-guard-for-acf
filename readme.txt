@@ -4,7 +4,7 @@ Tags: acf, advanced custom fields, local json, sync, field groups
 Requires at least: 7.0
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,9 @@ Prevents ACF field groups from being edited while Local JSON changes are waiting
 FieldLock Sync Guard for ACF detects ACF field-group JSON files that do not yet exist in the WordPress database or have a newer modified timestamp. While a sync is pending, it:
 
 * Shows an administrator notice with a link to ACF's sync screen.
+* Lists each pending field group and explains why it needs syncing.
 * Disables the Update button on ACF field-group edit screens.
+* Shows an inline explanation and sync link on locked edit screens.
 * Blocks normal field-group saves on the server.
 
 Private Local JSON files are ignored. Detection is cached briefly and runs only in the WordPress administrator. The plugin works with ACF and ACF PRO, and does not include ACF.
@@ -51,6 +53,10 @@ Example:
 `add_filter( 'fieldlock_sync_guard_for_acf_cache_lifetime', function () { return 30; } );`
 
 == Changelog ==
+
+= 1.1.0 =
+* List pending field groups and explain whether each group is missing or has newer Local JSON.
+* Add clearer lock messaging and a sync link to ACF field-group edit screens.
 
 = 1.0.1 =
 * Confirmed compatibility with WordPress 7.1.

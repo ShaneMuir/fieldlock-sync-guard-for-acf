@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       FieldLock Sync Guard for ACF
  * Description:       Prevents ACF field groups from being edited while Local JSON changes are waiting to be synced.
- * Version:           1.0.1
+ * Version:           1.1.0
  * Requires at least: 7.0
  * Requires PHP:      8.2
  * Author:            Shane Muirhead
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'FIELDLOCK_SYNC_GUARD_FOR_ACF_VERSION', '1.0.1' );
+define( 'FIELDLOCK_SYNC_GUARD_FOR_ACF_VERSION', '1.1.0' );
 define( 'FIELDLOCK_SYNC_GUARD_FOR_ACF_FILE', __FILE__ );
 define( 'FIELDLOCK_SYNC_GUARD_FOR_ACF_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FIELDLOCK_SYNC_GUARD_FOR_ACF_URL', plugin_dir_url( __FILE__ ) );
